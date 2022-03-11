@@ -113,5 +113,3 @@ process.on('SIGINT', function() {
   // this is only called on ctrl+c, not restart
   process.kill(process.pid, 'SIGINT');
 });
-
-// Création de la branche florian
