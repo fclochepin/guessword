@@ -22,11 +22,11 @@ const HOST = '0.0.0.0';
 
 // App
 const app = express();
+
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-
 app.set('view engine', 'ejs');
-app.use(express.urlencoded({extended: true})); // Specifying to use urlencoded
+app.use(express.static(__dirname + '/public'));
 
 app.get('/', function(req, res) {
   res.render('home');
@@ -61,9 +61,9 @@ io.on('connection', function(socket) {
             let R = Math.random() * reponse;
             Words.find(function(err, reponse) {
             // Pour le helper
-              io.to(socket.id).emit('startGameHelper', {word: reponse, users: users.find((user) => user.socketId === socket.id)});
+              io.to(socket.id).emit('startGameHelper', {word: reponse, user: users.find((user) => user.socketId === socket.id)});
               // Pour le guesser
-              io.to(coplayer.socketId).emit('startGameGuesser', users.find((user) => user.socketId === coplayer.socketId));
+              io.to(coplayer.socketId).emit('startGameGuesser', {word: reponse, user: users.find((user) => user.socketId === coplayer.socketId)});
             }).limit(1).skip(R);
           }
         });
