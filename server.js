@@ -23,27 +23,62 @@ app.get('/', function(req, res) {
 
 // eslint-disable-next-line prefer-const
 let users = [];
+let usersWaiting = [];
 let guesser = true;
 io.on('connection', function(socket) {
-  console.log('A user connected');
+  // Dès que la personne entre son nom
+  socket.join('ROOM');
   socket.on('setUsername', function(data) {
-    if (users.indexOf(data) == -1) {
-      users.push(data);
-      if (guesser) {
-        socket.emit('guesserSet', {username: data, guesser: true});
-        guesser = false;
+    // Si son nom est validé
+    if (!users.some((user) => user.username ===data)) {
+      // On vérifie si une personne est disponible pour jouer
+      if (usersWaiting.length >=1) {
+        // On récupère le joueur en attente
+        let coplayer = usersWaiting[0];
+        coplayer = users.find((user) => user.socketId === coplayer.socketId);
+        // Mise à jour du socketId du coplayer
+        coplayer.coplayer = socket.id;
+        // Push du new user
+        users.push({username: data, socketId: socket.id, guesser: !coplayer.guesser, coplayer: coplayer.socketId});
+        usersWaiting.splice(coplayer);
+        // Emit les événements pour démarrer la partie
+        // Pour le helper
+        io.to(socket.id).emit('startGameHelper', users.find((user) => user.socketId === socket.id));
+        // Pour le guesser
+        io.to(coplayer.socketId).emit('startGameGuesser', users.find((user) => user.socketId === coplayer.socketId));
+        console.log(usersWaiting);
       } else {
-        socket.emit('helperSet', {username: data, guesser: false});
-        guesser = true;
+        // On se met en attente d'un autre joueur
+        socket.emit('helperWaitGuesser', {username: data, guesser: false});
+        users.push({username: data, socketId: socket.id, guesser: false});
+        usersWaiting.push({username: data, socketId: socket.id, guesser: false});
       }
     } else {
       socket.emit('userExists', data + ' username is taken! Try some other username.');
     }
   });
 
-  socket.on('msg', function(data) {
-    // Send message to everyone
-    io.sockets.emit('newmsg', data);
+  socket.on('disconnect', function() {
+    // On vide users et usersWaiting
+    if (users.some((user) => user.socketId == socket.id)) {
+      users.splice(users.find((user) => user.socketId === socket.id));
+    }
+
+    if (usersWaiting.some((user) => user.socketId == socket.id)) {
+      usersWaiting.splice(usersWaiting.find((user) => user.socketId === socket.id));
+    }
+  });
+
+  socket.on('newword', function(data) {
+    // Le helper vient de soumettre un newword
+    // Data = informations du helper
+    console.log(data);
+    // Affichage du mot pour le helper
+    io.to('ROOM').emit('printWord', data);
+    // MàJ de l'interface du helper
+    io.to(data.userinfos.socketId).emit('wait', data);
+    // MàJ de l'interface du guesser
+    io.to(data.userinfos.coplayer).emit('send', data);
   });
 });
 
