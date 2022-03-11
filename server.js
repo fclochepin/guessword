@@ -4,6 +4,17 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const Words = require('./models/Words');
+
+
+mongoose.connect('mongodb://192.168.10.2:27017/guessword', function(err) {
+  if (err) {
+    throw err;
+  } else {
+    console.log('connexion reussie');
+  };
+});
 
 // Constants
 const PORT = 8080;
@@ -42,11 +53,20 @@ io.on('connection', function(socket) {
         users.push({username: data, socketId: socket.id, guesser: !coplayer.guesser, coplayer: coplayer.socketId});
         usersWaiting.splice(coplayer);
         // Emit les événements pour démarrer la partie
-        // Pour le helper
-        io.to(socket.id).emit('startGameHelper', users.find((user) => user.socketId === socket.id));
-        // Pour le guesser
-        io.to(coplayer.socketId).emit('startGameGuesser', users.find((user) => user.socketId === coplayer.socketId));
-        console.log(usersWaiting);
+        // Selection d'un mot aléatoire dans la base de données
+        Words.count(function(err, reponse) {
+          if (err) {
+            throw err;
+          } else {
+            let R = Math.random() * reponse;
+            Words.find(function(err, reponse) {
+            // Pour le helper
+              io.to(socket.id).emit('startGameHelper', {word: reponse, users: users.find((user) => user.socketId === socket.id)});
+              // Pour le guesser
+              io.to(coplayer.socketId).emit('startGameGuesser', users.find((user) => user.socketId === coplayer.socketId));
+            }).limit(1).skip(R);
+          }
+        });
       } else {
         // On se met en attente d'un autre joueur
         socket.emit('helperWaitGuesser', {username: data, guesser: false});

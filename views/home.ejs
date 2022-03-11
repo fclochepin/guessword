@@ -20,8 +20,9 @@
 
       //Démarrage de la partie côté Helper
       socket.on('startGameHelper', function(data){
-         user = data;
-         document.body.innerHTML = '<p>Vous allez devoir faire deviner le mot : Test</p>\
+         user = data.user;
+         console.log(data);
+         document.body.innerHTML = '<p>Vous allez devoir faire deviner le mot : ' + data.word[0].word + '</p>\
          <input type="text" id="message">\
          <button id="send" type="button" name="button" onclick="submitWord()">Send</button>\
          <div id="message-container"></div>';
@@ -31,7 +32,7 @@
 
       //Démarrage de la partie côté Guesser
       socket.on('startGameGuesser', function(data){
-         user = data;
+         user = data.user;
          document.body.innerHTML = '<p>Votre partenaire doit vous faire deviner un mot.</p>\
          <input type="text" id="message">\
          <button id="send" type="button" name="button" onclick="submitWord()">Send</button>\
