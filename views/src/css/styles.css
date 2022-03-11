@@ -1,0 +1,21 @@
+body {
+    padding-top: 10px;
+  }
+  [class="col-lg-5"], footer {
+    background-color: lightgreen;
+    border: 2px solid black;
+    border-radius: 6px;
+    line-height: 50px;
+    text-align: center;
+    font-weight: normal;
+    font-size: large;
+  }
+
+.headerGrid{
+    text-align:center;
+    border: 2px solid black;
+    line-height: 40px;
+    border-radius: 6px;
+    font-weight:bold;
+    font-size: x-large;
+}
