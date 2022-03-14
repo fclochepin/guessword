@@ -49,6 +49,7 @@
 
          //Démarrage de la partie côté Helper
          socket.on('startGameHelper', function(data){
+            console.log("Salut");
             user = data.user;
             document.getElementById("guessWord").innerHTML = "Vous devez faire deviner le mot : " + data.word[0].word;
             document.getElementById("headerListWord").style.visibility = 'visible'
@@ -59,6 +60,7 @@
 
          //Démarrage de la partie côté Guesser
          socket.on('startGameGuesser', function(data){
+            console.log("Salut");
             user = data.user;
             document.getElementById("waiting").innerHTML = "Démarrage du jeu, votre partenaire va faire une proposition ...";
             document.getElementById("headerListWord").style.visibility = 'visible'
@@ -114,6 +116,9 @@
     <div id="mainContainer" class="container">
          <img src="/logo.jpg">
          <br/> <br/>
+         <div id="error-container">
+
+         </div>
          <div id="login">
             <input id="name" type="text" name="name">
             <button type="button" onclick="setUsername()">Commencer la partie</button>

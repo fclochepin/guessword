@@ -2,11 +2,12 @@
 /* eslint-disable max-len */
 'use strict';
 
+// Constants
+const PORT = 8080;
+const HOST = '0.0.0.0';
 const express = require('express');
-const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const Words = require('./models/Words');
-
+const unitTest = require('./socket/test');
 
 mongoose.connect('mongodb://192.168.10.2:27017/guessword', function(err) {
   if (err) {
@@ -16,90 +17,56 @@ mongoose.connect('mongodb://192.168.10.2:27017/guessword', function(err) {
   };
 });
 
-// Constants
-const PORT = 8080;
-const HOST = '0.0.0.0';
 
 // App
 const app = express();
 
+// eslint-disable-next-line new-cap
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+
+module.exports = {
+  http: http,
+  io: io,
+};
+
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/public'));
+
+
+// ESPACE DE TEST
+
+// Socket gérant la verification du mot proposé par le helper
+const Dictionnaire = require('./models/Dictionnary');
+
+// FIN DES TEST
 
 app.get('/', function(req, res) {
   res.render('home');
 });
 
-// eslint-disable-next-line prefer-const
-let users = [];
-let usersWaiting = [];
-let guesser = true;
+app.get('/test', function(req, res) {
+
+});
+
 io.on('connection', function(socket) {
   // Dès que la personne entre son nom
   socket.join('ROOM');
-  socket.on('setUsername', function(data) {
-    // Si son nom est validé
-    if (!users.some((user) => user.username ===data)) {
-      // On vérifie si une personne est disponible pour jouer
-      if (usersWaiting.length >=1) {
-        // On récupère le joueur en attente
-        let coplayer = usersWaiting[0];
-        coplayer = users.find((user) => user.socketId === coplayer.socketId);
-        // Mise à jour du socketId du coplayer
-        coplayer.coplayer = socket.id;
-        // Push du new user
-        users.push({username: data, socketId: socket.id, guesser: !coplayer.guesser, coplayer: coplayer.socketId});
-        usersWaiting.splice(coplayer);
-        // Emit les événements pour démarrer la partie
-        // Selection d'un mot aléatoire dans la base de données
-        Words.count(function(err, reponse) {
-          if (err) {
-            throw err;
-          } else {
-            let R = Math.random() * reponse;
-            Words.find(function(err, reponse) {
-            // Pour le helper
-              io.to(socket.id).emit('startGameHelper', {word: reponse, user: users.find((user) => user.socketId === socket.id)});
-              // Pour le guesser
-              io.to(coplayer.socketId).emit('startGameGuesser', {word: reponse, user: users.find((user) => user.socketId === coplayer.socketId)});
-            }).limit(1).skip(R);
-          }
-        });
-      } else {
-        // On se met en attente d'un autre joueur
-        socket.emit('helperWaitGuesser', {username: data, guesser: false});
-        users.push({username: data, socketId: socket.id, guesser: false});
-        usersWaiting.push({username: data, socketId: socket.id, guesser: false});
-      }
-    } else {
-      socket.emit('userExists', data + ' username is taken! Try some other username.');
-    }
-  });
 
-  socket.on('disconnect', function() {
-    // On vide users et usersWaiting
-    if (users.some((user) => user.socketId == socket.id)) {
-      users.splice(users.find((user) => user.socketId === socket.id));
-    }
+  /**
+  * Socket gérant la connexion de l'utilisateur
+  */
+  require('./socket/login')(socket);
 
-    if (usersWaiting.some((user) => user.socketId == socket.id)) {
-      usersWaiting.splice(usersWaiting.find((user) => user.socketId === socket.id));
-    }
-  });
+  /**
+  * Socket gérant la déconnexion de l'utilisateur
+  */
+  require('./socket/logout')(socket);
 
-  socket.on('newword', function(data) {
-    // Le helper vient de soumettre un newword
-    // Data = informations du helper
-    console.log(data);
-    // Affichage du mot pour le helper
-    io.to('ROOM').emit('printWord', data);
-    // MàJ de l'interface du helper
-    io.to(data.userinfos.socketId).emit('wait', data);
-    // MàJ de l'interface du guesser
-    io.to(data.userinfos.coplayer).emit('send', data);
-  });
+  /**
+  * Socket gérant la vérification du mot de l'utilisateur
+  */
+  require('./socket/checkword')(socket);
 });
 
 // Listening on Host and Port
