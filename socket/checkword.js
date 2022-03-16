@@ -3,6 +3,7 @@ const Dictionnaire = require('../models/Dictionnary');
 const compareTwoWords = require('../shared/compareTwoWords');
 
 const io = require('../server').io;
+const users = require('../shared/users').users;
 
 module.exports = async function(socket) {
   socket.on('newword', async function(data) {
@@ -56,14 +57,16 @@ module.exports = async function(socket) {
             });
           };
         } else {
+          console.log(reponse.length);
           if (reponse.length!=0) {
             // Le mot est bien dans le dictionnaire
             finalWord = reponse[0].word;
           }
         }
 
+        console.log(finalWord);
         if (finalWord == '') {
-        // Emit un evenement mot pas trouvé
+          io.to(data.userinfos.socketId).emit('wordNotInDictionnary');
         } else {
         // On vérifie que le mot saisi par le guesser n'est pas le mot à deviner
           console.log(data.toGuess);
@@ -71,15 +74,33 @@ module.exports = async function(socket) {
           if (data.message == data.toGuess) {
             console.log(data.userinfos);
             if (data.userinfos.guesser) {
-              // Emit l'evènement la partie est gagnée
-              io.to('ROOM').emit('wordWin', data);
-              io.to('ROOM').emit('clearWords');
-              await new Promise((resolve) => setTimeout(resolve, 4000));
-              // MàJ de l'interface du helper
-              io.to(data.userinfos.socketId).emit('wait', data);
-              // MàJ de l'interface du guesser
-              io.to(data.userinfos.coplayer).emit('send', data);
-              console.log('Partie gagnée');
+              // S'il reste des round, on lance un nouveau round
+              if (data.round < data.nbRound) {
+                const R = Math.random() * reponse;
+                Words.find(function(err, reponse) {
+                  // Changement de rôle
+                  data.userinfos.guesser = !data.userinfos.guesser;
+                  data.message = '';
+                  data.round++;
+                  data.toGuess = reponse[0].word;
+
+                  // Pour le helper
+                  console.log('send to helper');
+                  io.to(socket.id).emit('newRoundHelper', data);
+
+                  // Traitement de l'autre user
+                  data.userinfos = users.find(
+                      (user) => user.socketId ===
+                      data.userinfos.coplayer);
+
+                  data.userinfos.guesser = !data.userinfos.guesser;
+
+                  // Pour le guesser
+                  io.to(data.userinfos.socketId).emit(
+                      'newRoundGuesser', data);
+                }).limit(1).skip(R);
+              }
+              // await new Promise((resolve) => setTimeout(resolve, 4000));
             } else {
               console.log('Vous ne pouvez pas saisir le mot à deviner');
             }

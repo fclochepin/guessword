@@ -14,5 +14,5 @@ document.getElementById('usernameButton').
 
 // Si le user existe, on l'affiche à l'utilisateur
 socket.on('userExists', function(data) {
-  document.getElementById('error-container').innerHTML = data;
+  document.getElementById('messageInfo').innerHTML = data;
 });

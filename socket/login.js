@@ -38,14 +38,14 @@ module.exports = function(socket) {
               console.log('send to helper');
               io.to(socket.id).emit('startGameHelper', {
                 toGuess: reponse[0].word.toLowerCase(),
-                nWord: 1,
-                nWordMax: 6,
+                round: 1,
+                nbRound: 6,
                 userinfos: users.find((user) => user.socketId === socket.id)});
               // Pour le guesser
               io.to(coplayer.socketId).emit('startGameGuesser', {
                 toGuess: reponse[0].word.toLowerCase(),
-                nWord: 1,
-                nWordMax: 6,
+                round: 1,
+                nbRound: 6,
                 userinfos: users.find(
                     (user) => user.socketId === coplayer.socketId)});
             }).limit(1).skip(R);

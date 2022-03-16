@@ -35,3 +35,11 @@ socket.on('startGameGuesser', function(data) {
   document.getElementById('guessWord').style.visibility = 'hidden';
   document.getElementById('blocProposition').style.visibility = 'hidden';
 });
+
+socket.on('newRoundHelper', function(data) {
+  console.log(data);
+});
+
+socket.on('newRoundGuesser', function(data) {
+  console.log(data);
+});
