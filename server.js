@@ -7,7 +7,6 @@ const PORT = 8080;
 const HOST = '0.0.0.0';
 const express = require('express');
 const mongoose = require('mongoose');
-const unitTest = require('./socket/test');
 
 mongoose.connect('mongodb://192.168.10.2:27017/guessword', function(err) {
   if (err) {
@@ -36,8 +35,6 @@ app.use(express.static(__dirname + '/public'));
 
 // ESPACE DE TEST
 
-// Socket gérant la verification du mot proposé par le helper
-const Dictionnaire = require('./models/Dictionnary');
 
 // FIN DES TEST
 

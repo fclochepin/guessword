@@ -49,12 +49,13 @@ module.exports = function(socket) {
                 userinfos: users.find(
                     (user) => user.socketId === coplayer.socketId)});
             }).limit(1).skip(R);
+            console.log(users);
           }
         });
       } else {
       // On se met en attente d'un autre joueur
-        socket.emit('helperWaitGuesser', {username: data, guesser: false});
-        users.push({username: data, socketId: socket.id, guesser: false});
+        socket.emit('helperWaitGuesser', {username: data, guesser: true});
+        users.push({username: data, socketId: socket.id, guesser: true});
         usersWaiting.push({
           username: data,
           socketId: socket.id,
