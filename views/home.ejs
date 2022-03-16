@@ -50,8 +50,8 @@
          //Démarrage de la partie côté Helper
          socket.on('startGameHelper', function(data){
             console.log("Salut");
-            user = data.user;
-            document.getElementById("guessWord").innerHTML = "Vous devez faire deviner le mot : " + data.word[0].word;
+            allData = data;
+            document.getElementById("guessWord").innerHTML = "Vous devez faire deviner le mot : " + data.toGuess;
             document.getElementById("headerListWord").style.visibility = 'visible'
             document.getElementById("listWord").style.visibility = 'visible'
             document.getElementById('guessWord').style.visibility = 'visible';
@@ -60,8 +60,7 @@
 
          //Démarrage de la partie côté Guesser
          socket.on('startGameGuesser', function(data){
-            console.log("Salut");
-            user = data.user;
+            allData = data;
             document.getElementById("waiting").innerHTML = "Démarrage du jeu, votre partenaire va faire une proposition ...";
             document.getElementById("headerListWord").style.visibility = 'visible'
             document.getElementById("listWord").style.visibility = 'visible'
@@ -72,8 +71,8 @@
          function submitWord(){
             var msg = document.getElementById('message').value;
             if(msg){
-               socket.emit('newword', {message: msg, userinfos:user});
-               console.log("Message submit");
+               allData.message = msg;
+               socket.emit('newword', allData);
             }
          }
 
@@ -88,13 +87,10 @@
          // Affichage du nouveau mot
          socket.on('printWord', function(data){
             console.log("On print word")
-            if(user){
-               console.log("User exist in printword");
-               const newword = document.createElement('div');
-               newword.className = "col-lg-5";
-               newword.innerHTML = data.message;
-               document.getElementById('listWord').appendChild(newword);
-            }
+            const newword = document.createElement('div');
+            newword.className = "col-lg-5";
+            newword.innerHTML = data.message;
+            document.getElementById('listWord').appendChild(newword);
          })
       </script>
    </head>

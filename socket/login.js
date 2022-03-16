@@ -37,12 +37,16 @@ module.exports = function(socket) {
             // Pour le helper
               console.log('send to helper');
               io.to(socket.id).emit('startGameHelper', {
-                word: reponse,
-                user: users.find((user) => user.socketId === socket.id)});
+                toGuess: reponse[0].word.toLowerCase(),
+                nWord: 1,
+                nWordMax: 6,
+                userinfos: users.find((user) => user.socketId === socket.id)});
               // Pour le guesser
               io.to(coplayer.socketId).emit('startGameGuesser', {
-                word: reponse,
-                user: users.find(
+                toGuess: reponse[0].word.toLowerCase(),
+                nWord: 1,
+                nWordMax: 6,
+                userinfos: users.find(
                     (user) => user.socketId === coplayer.socketId)});
             }).limit(1).skip(R);
           }
@@ -54,7 +58,7 @@ module.exports = function(socket) {
         usersWaiting.push({
           username: data,
           socketId: socket.id,
-          guesser: false});
+          guesser: true});
         console.log(usersWaiting);
       }
     } else {
