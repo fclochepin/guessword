@@ -43,7 +43,8 @@ app.get('/', function(req, res) {
 });
 
 app.get('/test', function(req, res) {
-
+  let today = new Date();
+  console.log( today.getTime());
 });
 
 io.on('connection', function(socket) {
@@ -64,6 +65,11 @@ io.on('connection', function(socket) {
   * Socket gérant la vérification du mot de l'utilisateur
   */
   require('./socket/checkword')(socket);
+
+  /**
+  * Socket gérant la vérification du mot de l'utilisateur
+  */
+  require('./socket/startRound')(socket);
 });
 
 // Listening on Host and Port

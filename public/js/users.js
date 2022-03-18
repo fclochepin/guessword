@@ -16,3 +16,7 @@ document.getElementById('usernameButton').
 socket.on('userExists', function(data) {
   document.getElementById('messageInfo').innerHTML = data;
 });
+
+socket.on('userLeaveRoom', function(data) {
+  document.getElementById(data.socketid).remove();
+});

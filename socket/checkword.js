@@ -21,7 +21,6 @@ module.exports = async function(socket) {
           '$language': 'none',
           '$diacriticSensitive': false}}, async function(err, reponse2) {
         reponse = reponse.concat(reponse2);
-        console.log(reponse);
         // Vérifions le nombre de mots trouvés dans le dictionnaire
         let finalWord = '';
         if (reponse.length > 1) {
@@ -33,7 +32,6 @@ module.exports = async function(socket) {
             reponse.forEach(function(item) {
               if (item.word.normalize('NFD').replace(/[\u0300-\u036f]/g, '') ==
               data.message.normalize('NFD').replace(/[\u0300-\u036f]/g, '')) {
-                console.log('non-accentued corresponding');
                 nonAccentuedWord.push(item.word);
                 compareTwoWords.scoreWords('test', 'test');
               };
@@ -47,58 +45,44 @@ module.exports = async function(socket) {
                 nonAccentuedWord.forEach(function(item) {
                   scores.push(compareTwoWords.scoreWords(item, data.message));
                 });
-                console.log(scores);
-                console.log(Math.max.apply(null, scores));
-                console.log(scores.indexOf(Math.max.apply(null, scores)));
-                console.log(nonAccentuedWord);
                 finalWord = nonAccentuedWord[
                     scores.indexOf(Math.max.apply(null, scores))];
               }
             });
           };
         } else {
-          console.log(reponse.length);
           if (reponse.length!=0) {
             // Le mot est bien dans le dictionnaire
             finalWord = reponse[0].word;
           }
         }
 
-        console.log(finalWord);
         if (finalWord == '') {
           io.to(data.userinfos.socketId).emit('wordNotInDictionnary');
         } else {
         // On vérifie que le mot saisi par le guesser n'est pas le mot à deviner
-          console.log(data.toGuess);
-          console.log(data.userinfos);
-          if (data.message == data.toGuess) {
-            console.log(data.userinfos);
+          if (data.message.toLowerCase() == data.toGuess[data.round].word.toLowerCase()) {
             if (data.userinfos.guesser) {
               // S'il reste des round, on lance un nouveau round
               if (data.round < data.nbRound) {
-                const R = Math.random() * reponse;
-                Words.find(function(err, reponse) {
-                  // Changement de rôle
-                  data.userinfos.guesser = !data.userinfos.guesser;
-                  data.message = '';
-                  data.round++;
-                  data.toGuess = reponse[0].word;
+                // Changement de rôle
+                data.userinfos.guesser = !data.userinfos.guesser;
+                data.message = '';
+                data.round++;
 
-                  // Pour le helper
-                  console.log('send to helper');
-                  io.to(socket.id).emit('newRoundHelper', data);
+                // Pour le helper
+                io.to(socket.id).emit('newRoundHelper', data);
 
-                  // Traitement de l'autre user
-                  data.userinfos = users.find(
-                      (user) => user.socketId ===
+                // Traitement de l'autre user
+                data.userinfos = users.find(
+                    (user) => user.socketId ===
                       data.userinfos.coplayer);
 
-                  data.userinfos.guesser = !data.userinfos.guesser;
+                data.userinfos.guesser = !data.userinfos.guesser;
 
-                  // Pour le guesser
-                  io.to(data.userinfos.socketId).emit(
-                      'newRoundGuesser', data);
-                }).limit(1).skip(R);
+                // Pour le guesser
+                io.to(data.userinfos.socketId).emit(
+                    'newRoundGuesser', data);
               }
               // await new Promise((resolve) => setTimeout(resolve, 4000));
             } else {
@@ -106,8 +90,11 @@ module.exports = async function(socket) {
             }
           } else {
           // Affichage du mot pour le helper
+            console.log(data);
             data.message = finalWord;
-            io.to('ROOM').emit('printWord', data);
+            io.to(data.userinfos.socketId).emit('printWord', data);
+            io.to(data.userinfos.coplayer).emit('printWord', data);
+
             // MàJ de l'interface du helper
             io.to(data.userinfos.socketId).emit('wait', data);
             // MàJ de l'interface du guesser

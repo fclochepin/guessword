@@ -10,6 +10,7 @@ const socket = getSocket();
 function submitWord() {
   const msg = document.getElementById('message').value;
   if (msg) {
+    console.log(getData());
     const newData = getData();
     newData.message = msg;
     setData(newData);
@@ -30,7 +31,6 @@ socket.on('send', function() {
 
 // Affichage du nouveau mot
 socket.on('printWord', function(data) {
-  console.log('On print word');
   const newword = document.createElement('div');
   newword.className = 'col-lg-5';
   newword.innerHTML = data.message;
@@ -38,12 +38,33 @@ socket.on('printWord', function(data) {
 });
 
 socket.on('wordNotInDictionnary', function() {
-  document.getElementById('messageInfo').innerHTML = 'Erreur, \
-  ce mot n\'est pas dans le dictionnaire';
+  document.getElementById('containerWord').insertBefore(createError('<strong>Erreur</strong> Ce mot ne fait pas partie du dictionnaire :('), document.getElementById('blocProposition'));
 });
 
 socket.on('hideWordNDictionnary', function() {
   document.getElementById('messageInfo').innerHTML = '';
 });
 
+function createError(message) {
+  const div = document.createElement('div');
+  const button = document.createElement('button');
+  div.innerHTML = message;
+  div.className = 'alert alert-danger alert-dismissible fade show';
+  button.type = 'button';
+  button.className = 'btn-close';
+  button.setAttribute('data-bs-dismiss', 'alert');
+  div.appendChild(button);
+  return div;
+};
 
+function createValidate(message) {
+  const div = document.createElement('div');
+  const button = document.createElement('button');
+  div.innerHTML = message;
+  div.className = 'alert alert-success alert-dismissible fade show';
+  button.type = 'button';
+  button.className = 'btn-close';
+  button.setAttribute('data-bs-dismiss', 'alert');
+  div.appendChild(button);
+  return div;
+};

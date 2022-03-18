@@ -1,6 +1,11 @@
 body {
-    padding-top: 10px;
+    background: url('/background.jpg') no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
+  -o-background-size: cover;
   }
+
   [class="col-lg-5"], footer {
     background-color: lightgreen;
     border: 2px solid black;
@@ -18,4 +23,28 @@ body {
     border-radius: 6px;
     font-weight:bold;
     font-size: x-large;
+}
+
+.container, .container-fluid{
+  margin-top: 5%;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  border:10px solid;
+  border-color: rgba(0, 0, 0, 0.4);
+}
+
+.col-menu{
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 20px;
+  border:5px solid;
+  border-color: rgba(0, 0, 0, 0.4);
+}
+
+h2{
+  color:white;
+}
+
+.col-3{
+  background-color: white;
+  margin: 15px;
 }

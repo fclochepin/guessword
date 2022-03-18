@@ -7,7 +7,7 @@
    
       <meta name="description" content="">
       <meta name="author" content="">
-      <link rel="icon" href="/miniature.png">
+      <link rel="icon" href="/favicon.png">
 
       <title>GuessWord</title>
 
@@ -27,55 +27,77 @@
    </head>
 
    <body>
-   <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Retour au menu</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-        </div><!--/.nav-collapse -->
-      </div>
-    </nav>
 
-    <div id="mainContainer" class="container">
-         <img src="/logo.jpg">
+    <div id="mainContainer" class="d-none d-md-block container">
+         <div class="d-flex align-items-center justify-content-center">
+            <img src="/logo.png" width="70%">
+         </div>
+
+         <div id="mainRow" class="row d-flex justify-content-around text-center">
+            <div id="blocLeft" class="col-menu col-sm-7">
+               <div class="row d-flex align-items-center justify-content-center" style="margin:3%;">
+                  <h2 id="titleLeft">Choisis ton pseudo</h2>
+               </div>
+               <div class="alert alert-danger alert-dismissible fade show">
+                  <strong>Error!</strong> A problem has been occurred while submitting your data.
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+               <div id="setUsername">
+                  <input id="name" type="text" name="name">
+                  <button id="usernameButton" type="button">Démarrer</button>
+               </div>
+
+               <!--<div class="col-3 col-xl-2"><br><br><br><br></div>
+               <div class="col-3 col-xl-2"><br><br><br><br></div>!-->
+
+               <br/> <br/>
+               <br/> <br/>
+               <br/> <br/>
+               <br/> <br/>
+               <br/> <br/>
+               <br/> <br/>
+               <br/> <br/>
+               <br/> <br/>
+               <br/> <br/>
+            </div>
+            
+            <div id="blocRight" class="col-menu col-sm-4">
+               <div class="row d-flex align-items-center justify-content-center" style="margin:5%;">
+                  <h2>Comment jouer ?</h2>
+               </div>
+            </div>
+            <div id="blocProposition"  style="visibility:hidden; position:absolute;">
+               <p id="envoiProposition" class="lead">Envoyer un indice :</p>
+               <input type="text" id="message">
+               <button id="send" type="button" name="button">Send</button>
+            </div>
+            
+            <div id="headerListWord" class="row" style="visibility:hidden; position:absolute;">
+               <div id="user1" class="headerGrid col-lg-5"> Vous </div>
+               <div id="user2" class="headerGrid col-lg-5"> Guest3785 </div>
+           </div>
+
+           <div id="listWord" class="row" style="visibility:hidden; position:absolute;">
+
+            </div>
+
+         </div>
          <br/> <br/>
+
          <div id="messageInfo">
 
          </div>
-         <div id="login">
-            <input id="name" type="text" name="name">
-            <button id="usernameButton" type="button">Commencer la partie</button>
-         </div>   
 
-         <div class="content-words" style="visibility:hidden;">
 
-         <div class="howtouse">
-         <br> 
-
-         <div id="guessWord">
-            <p class="lead">Vous devez faire deviner le mot : COURAGE.</p>
-         </div>
          
-         <div id="blocProposition">
-            <p id="envoiProposition" class="lead">Envoyer un indice :</p>
-            <input type="text" id="message">
-            <button id="send" type="button" name="button">Send</button>
-         </div>
+
          
+         <!--
          <div id="message-container"> <br> <br></div>
 
       </div>    
 
-    <div id="headerListWord" class="row">
 
-        <div class="headerGrid col-lg-5"> Vous </div>
-        <div class="headerGrid col-lg-5"> Guest3785 </div>
-    
-    </div>
 
     <div id="listWord" class="row">
 
@@ -85,9 +107,14 @@
         <br>
         <p class="lead">Score actuel : 0</p>
     </div>
-    </div>
+    </div>!-->
 
     </div><!-- /.container -->
+
+    <div id="mainContainer" class="d-block d-md-none container-fluid" style="width:90%;">
+
+   </div>
+
 
   </body>
    </html>
