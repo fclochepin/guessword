@@ -38,13 +38,9 @@
                <div class="row d-flex align-items-center justify-content-center" style="margin:3%;">
                   <h2 id="titleLeft">Choisis ton pseudo</h2>
                </div>
-               <div class="alert alert-danger alert-dismissible fade show">
-                  <strong>Error!</strong> A problem has been occurred while submitting your data.
-                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-              </div>
-               <div id="setUsername">
+               <div id="setUsername" class="col-sm-8">
                   <input id="name" type="text" name="name">
-                  <button id="usernameButton" type="button">Démarrer</button>
+                  <button id="usernameButton" type="button" class="btn btn-info">Démarrer</button>
                </div>
 
                <!--<div class="col-3 col-xl-2"><br><br><br><br></div>
@@ -67,17 +63,15 @@
                </div>
             </div>
             <div id="blocProposition"  style="visibility:hidden; position:absolute;">
-               <p id="envoiProposition" class="lead">Envoyer un indice :</p>
+               <p id="envoiProposition" class="lead">Envoyer un mot :</p>
                <input type="text" id="message">
-               <button id="send" type="button" name="button">Send</button>
+               <button id="send" type="button" name="button" class="btn btn-success">Send</button>
             </div>
-            
-            <div id="headerListWord" class="row" style="visibility:hidden; position:absolute;">
-               <div id="user1" class="headerGrid col-lg-5"> Vous </div>
-               <div id="user2" class="headerGrid col-lg-5"> Guest3785 </div>
+            <div id="headerListWord" class="row" style="visibility:hidden; position:absolute; padding:20px;">
+               <div id="user1" class="col-sm-6 headerGrid" style="color:white;"> Vous </div>
+               <div id="user2" class="col-sm-6 headerGrid" style="color:white;"> Guest3785 </div>
            </div>
-
-           <div id="listWord" class="row" style="visibility:hidden; position:absolute;">
+           <div id="listWord" class="row" style="visibility:hidden; position:absolute; padding:20px;">
 
             </div>
 

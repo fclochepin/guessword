@@ -1,6 +1,8 @@
 /* eslint-disable no-multi-str */
 import {getSocket} from './socket.js';
 import {getData, setData} from './data.js';
+import {createValidate} from './words.js';
+
 const socket = getSocket();
 
 // Mise en attente du guesser
@@ -34,6 +36,7 @@ socket.on('showHost', function(data) {
   button.id = 'startRound';
   button.type = 'button';
   button.innerHTML = 'Lancer la partie';
+  button.className = 'btn btn-success';
   document.getElementById('blocLeft').appendChild(button);
   button.addEventListener('click', function() {
     socket.emit('startRound', getData());
@@ -126,11 +129,28 @@ socket.on('startGameGuesser', function(data) {
 });
 
 socket.on('newRoundHelper', function(data) {
+  setData(data);
+  document.getElementById('containerWord').insertBefore(createValidate('<strong>Bravo !</strong> Vous avez correctement trouvé le mot, c\'est à votre tour de faire deviner !'), document.getElementById('titleWord'));
   document.getElementById('titleWord').innerHTML = 'Vous devez faire deviner le mot ' + data.toGuess[data.round].word;
-  console.log(data);
+  document.getElementById('message').value = '';
+  document.getElementById('listWord').innerHTML = '';
+  const user2 = document.getElementById('user2').innerHTML;
+  document.getElementById('user2').innerHTML = document.getElementById('user1').innerHTML;
+  document.getElementById('user1').innerHTML = user2;
+  console.log(getData());
 });
 
 socket.on('newRoundGuesser', function(data) {
+  setData(data);
+  document.getElementById('containerWord').insertBefore(createValidate('<strong>Bravo !</strong> Votre partenaire a trouvé le mot, c\'est à votre tour de deviner !'), document.getElementById('titleWord'));
   document.getElementById('titleWord').innerHTML = data.userinfos.coplayername + ' doit vous faire deviner le mot ';
-  console.log(data);
+  document.getElementById('listWord').innerHTML = '';
+  const user2 = document.getElementById('user2').innerHTML;
+  document.getElementById('user2').innerHTML = document.getElementById('user1').innerHTML;
+  document.getElementById('user1').innerHTML = user2;
+  console.log(getData());
+});
+
+socket.on('finpartie', function() {
+  document.getElementById('containerWord').innerHTML = 'Bravo, vous avez gagné la partie';
 });

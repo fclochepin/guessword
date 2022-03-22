@@ -66,31 +66,46 @@ module.exports = async function(socket) {
               // S'il reste des round, on lance un nouveau round
               if (data.round < data.nbRound) {
                 // Changement de rôle
+                data.points = data.point + 1;
                 data.userinfos.guesser = !data.userinfos.guesser;
                 data.message = '';
-                data.round++;
+                data.round = data.round+1;
+
+                let indexUser = users.findIndex(
+                    (user) => user.socketId ==
+                    data.userinfos.socketId);
+                users[indexUser] = data.userinfos;
 
                 // Pour le helper
                 io.to(socket.id).emit('newRoundHelper', data);
+                console.log('helper : ' + data.userinfos.guesser);
 
                 // Traitement de l'autre user
                 data.userinfos = users.find(
-                    (user) => user.socketId ===
+                    (user) => user.socketId ==
                       data.userinfos.coplayer);
+
+                indexUser = users.findIndex(
+                    (user) => user.socketId ==
+                        data.userinfos.socketId);
+                users[indexUser] = data.userinfos;
 
                 data.userinfos.guesser = !data.userinfos.guesser;
 
                 // Pour le guesser
                 io.to(data.userinfos.socketId).emit(
                     'newRoundGuesser', data);
+              } else {
+                io.to(data.userinfos.socketId).emit(
+                    'finpartie', data);
+                io.to(data.userinfos.coplayer).emit(
+                    'finpartie', data);
               }
               // await new Promise((resolve) => setTimeout(resolve, 4000));
             } else {
               console.log('Vous ne pouvez pas saisir le mot à deviner');
             }
           } else {
-          // Affichage du mot pour le helper
-            console.log(data);
             data.message = finalWord;
             io.to(data.userinfos.socketId).emit('printWord', data);
             io.to(data.userinfos.coplayer).emit('printWord', data);
