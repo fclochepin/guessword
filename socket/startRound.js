@@ -18,7 +18,7 @@ module.exports = function(socket) {
       users.forEach(function(item) {
         tabSocketId.push(item.socketId);
       });
-      const duos = [];
+
       tabSocketId = tabSocketId.sort();
       if (tabSocketId.length%2==1) {
         tabSocketId.splice(0, 1);
@@ -28,9 +28,8 @@ module.exports = function(socket) {
         const newRoom = String(i) + String(today.getTime());
         const user = users.find((user) => user.socketId==tabSocketId[i]);
         const coplayer = users.find((user) => user.socketId==tabSocketId[i+1]);
-        // rooms.push(newRoom);
-        // users.find((user) => user.socketId==tabSocketId[i]).socket.join(newRoom);
-        // users.find((user) => user.socketId==tabSocketId[i+1]).socket.join(newRoom);
+        const room = {roomId: newRoom, nbRound: 2, round: 0, points: 0};
+        rooms.push(room);
 
         user.room = newRoom;
         coplayer.room = newRoom;
@@ -52,22 +51,17 @@ module.exports = function(socket) {
               // Pour le guesser
               io.to(user.socketId).emit('startGameGuesser', {
                 toGuess: reponse,
-                round: 0,
-                nbRound: 4,
-                userinfos: user});
+                userinfos: user,
+                round: 0});
               io.to(coplayer.socketId).emit('startGameHelper', {
                 toGuess: reponse,
-                round: 0,
-                nbRound: 4,
-                userinfos: coplayer});
+                userinfos: coplayer,
+                round: 0});
             }).limit(4).skip(R);
             console.log(users);
           }
         });
       }
-      users.forEach(function(element) {
-
-      });
     }
   });
 };

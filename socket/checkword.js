@@ -4,6 +4,7 @@ const compareTwoWords = require('../shared/compareTwoWords');
 
 const io = require('../server').io;
 const users = require('../shared/users').users;
+const rooms = require('../shared/users').rooms;
 
 module.exports = async function(socket) {
   socket.on('newword', async function(data) {
@@ -60,16 +61,21 @@ module.exports = async function(socket) {
         if (finalWord == '') {
           io.to(data.userinfos.socketId).emit('wordNotInDictionnary');
         } else {
-        // On vérifie que le mot saisi par le guesser n'est pas le mot à deviner
-          if (data.message.toLowerCase() == data.toGuess[data.round].word.toLowerCase()) {
+          const roomIndex = rooms.findIndex(
+              (room) => room.roomId==data.userinfos.room);
+          const room = rooms[roomIndex];
+
+          // On vérifie que le mot saisi par le guesser n'est pas le mot à deviner
+          if (finalWord.toLowerCase() == data.toGuess[room.round].word.toLowerCase()) {
             if (data.userinfos.guesser) {
               // S'il reste des round, on lance un nouveau round
-              if (data.round < data.nbRound) {
+              if (room.round < room.nbRound) {
                 // Changement de rôle
-                data.points = data.point + 1;
+                room.points = room.points + 1;
                 data.userinfos.guesser = !data.userinfos.guesser;
                 data.message = '';
-                data.round = data.round+1;
+                room.round = room.round +1;
+                rooms[roomIndex] = room;
 
                 let indexUser = users.findIndex(
                     (user) => user.socketId ==
@@ -77,7 +83,7 @@ module.exports = async function(socket) {
                 users[indexUser] = data.userinfos;
 
                 // Pour le helper
-                io.to(socket.id).emit('newRoundHelper', data);
+                io.to(socket.id).emit('newRoundHelper', {user: data, round: room.round});
                 console.log('helper : ' + data.userinfos.guesser);
 
                 // Traitement de l'autre user
@@ -88,9 +94,11 @@ module.exports = async function(socket) {
                 indexUser = users.findIndex(
                     (user) => user.socketId ==
                         data.userinfos.socketId);
-                users[indexUser] = data.userinfos;
 
                 data.userinfos.guesser = !data.userinfos.guesser;
+
+                users[indexUser] = data.userinfos;
+
 
                 // Pour le guesser
                 io.to(data.userinfos.socketId).emit(

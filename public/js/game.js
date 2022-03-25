@@ -2,7 +2,7 @@
 import {getSocket} from './socket.js';
 import {getData, setData} from './data.js';
 import {createValidate} from './words.js';
-
+import {setCd, getCd} from './countdown.js';
 const socket = getSocket();
 
 // Mise en attente du guesser
@@ -74,6 +74,11 @@ socket.on('startGameHelper', function(data) {
   newTitle.innerHTML = 'Vous devez faire deviner le mot ' + data.toGuess[data.round].word;
   document.getElementById('containerWord').appendChild(newTitle);
 
+  // Affichage du countdown
+  document.getElementById('containerWord').appendChild(document.getElementById('countdown'));
+  document.getElementById('countdown').style.visibility = 'visible';
+  document.getElementById('countdown').style.position = 'static';
+
   // Affichage du bloc de propositions
   document.getElementById('containerWord').appendChild(document.getElementById('blocProposition'));
   document.getElementById('blocProposition').style.visibility = 'visible';
@@ -92,6 +97,13 @@ socket.on('startGameHelper', function(data) {
   document.getElementById('listWord').style.visibility = 'visible';
   document.getElementById('listWord').style.position = 'static';
 
+  const countDownDate = new Date().getTime();
+  setCd(setInterval(function() {
+    if (!startCountdown(countDownDate+(180*1000))) {
+      clearInterval(getCd());
+    }
+  }, 1000));
+
   setData(data);
 });
 
@@ -107,6 +119,11 @@ socket.on('startGameGuesser', function(data) {
   newTitle.id = 'titleWord';
   newTitle.innerHTML = data.userinfos.coplayername + ' doit vous faire deviner le mot ';
   document.getElementById('containerWord').appendChild(newTitle);
+
+  // Affichage du countdown
+  document.getElementById('containerWord').appendChild(document.getElementById('countdown'));
+  document.getElementById('countdown').style.visibility = 'visible';
+  document.getElementById('countdown').style.position = 'static';
 
   // Affichage du bloc de propositions
   document.getElementById('containerWord').appendChild(document.getElementById('blocProposition'));
@@ -125,13 +142,27 @@ socket.on('startGameGuesser', function(data) {
   document.getElementById('listWord').style.visibility = 'visible';
   document.getElementById('listWord').style.position = 'static';
 
+  const countDownDate = new Date().getTime();
+  setCd(setInterval(function() {
+    if (!startCountdown(countDownDate+(180*1000))) {
+      clearInterval(getCd());
+    }
+  }, 1000));
+
   setData(data);
 });
 
 socket.on('newRoundHelper', function(data) {
-  setData(data);
+  clearInterval(getCd());
+  const countDownDate = new Date().getTime();
+  setCd(setInterval(function() {
+    if (!startCountdown(countDownDate+(180*1000))) {
+      clearInterval(getCd());
+    }
+  }, 1000));
+  setData(data.user);
   document.getElementById('containerWord').insertBefore(createValidate('<strong>Bravo !</strong> Vous avez correctement trouvé le mot, c\'est à votre tour de faire deviner !'), document.getElementById('titleWord'));
-  document.getElementById('titleWord').innerHTML = 'Vous devez faire deviner le mot ' + data.toGuess[data.round].word;
+  document.getElementById('titleWord').innerHTML = 'Vous devez faire deviner le mot ' + data.user.toGuess[data.round].word;
   document.getElementById('message').value = '';
   document.getElementById('listWord').innerHTML = '';
   const user2 = document.getElementById('user2').innerHTML;
@@ -141,6 +172,13 @@ socket.on('newRoundHelper', function(data) {
 });
 
 socket.on('newRoundGuesser', function(data) {
+  clearInterval(getCd());
+  const countDownDate = new Date().getTime();
+  setCd(setInterval(function() {
+    if (!startCountdown(countDownDate+(180*1000))) {
+      clearInterval(getCd());
+    }
+  }, 1000));
   setData(data);
   document.getElementById('containerWord').insertBefore(createValidate('<strong>Bravo !</strong> Votre partenaire a trouvé le mot, c\'est à votre tour de deviner !'), document.getElementById('titleWord'));
   document.getElementById('titleWord').innerHTML = data.userinfos.coplayername + ' doit vous faire deviner le mot ';
@@ -154,3 +192,23 @@ socket.on('newRoundGuesser', function(data) {
 socket.on('finpartie', function() {
   document.getElementById('containerWord').innerHTML = 'Bravo, vous avez gagné la partie';
 });
+
+function startCountdown(endTime) {
+  // console.log(endTime);
+  const now = new Date().getTime();
+
+  // Find the distance between now and the count down date
+  const distance = endTime - now;
+  console.log(distance);
+  const minutes = Math.floor((distance % (1000*60*60)) / (1000*60));
+  const seconds = Math.floor((distance % (1000*60)/1000));
+
+  document.getElementById('countdown').innerHTML = minutes + 'm ' + seconds + 's ';
+
+  // If the count down is finished, write some text
+  // console.log(distance);
+  if (distance <= 1000) {
+    return false;
+  }
+  return true;
+}

@@ -14,7 +14,6 @@ function submitWord() {
     console.log(getData());
     const newData = getData();
     newData.message = msg;
-    setData(newData);
     socket.emit('newword', newData);
   }
 }
