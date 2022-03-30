@@ -8,7 +8,7 @@ const HOST = '0.0.0.0';
 const express = require('express');
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://192.168.10.2:27017/guessword', function(err) {
+mongoose.connect('mongodb://192.168.1.3:27017/guessword', function(err) {
   if (err) {
     throw err;
   } else {
